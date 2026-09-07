@@ -1,0 +1,119 @@
+.analytics-page-container {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.analytics-funnel-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 1rem;
+}
+
+.funnel-card {
+  background-color: var(--bg-card);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-xl);
+  padding: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  box-shadow: var(--shadow-sm);
+}
+
+.funnel-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.funnel-label {
+  font-size: 0.825rem;
+  font-weight: 600;
+  color: var(--text-muted);
+}
+
+.funnel-icon {
+  padding: 4px;
+  border-radius: var(--radius-sm);
+}
+.funnel-icon.blue { color: #3b82f6; background: rgba(59, 130, 246, 0.1); }
+.funnel-icon.purple { color: #8b5cf6; background: rgba(139, 92, 246, 0.1); }
+.funnel-icon.green { color: #10b981; background: rgba(16, 185, 129, 0.1); }
+.funnel-icon.orange { color: #f59e0b; background: rgba(245, 158, 11, 0.1); }
+
+.funnel-value {
+  font-size: 2rem;
+  font-weight: 800;
+  color: var(--text-main);
+  line-height: 1;
+}
+
+.funnel-card small {
+  font-size: 0.75rem;
+  color: var(--text-dim);
+}
+
+.analytics-charts-grid {
+  display: grid;
+  grid-template-columns: 1.5fr 1fr;
+  gap: 1.5rem;
+}
+
+.analytics-charts-grid-two {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1.5rem;
+}
+
+.chart-card-full,
+.chart-card {
+  background-color: var(--bg-card);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-xl);
+  padding: 1.5rem;
+  box-shadow: var(--shadow-sm);
+  display: flex;
+  flex-direction: column;
+}
+
+.chart-header {
+  margin-bottom: 1.25rem;
+}
+
+.chart-header h3 {
+  font-size: 1.15rem;
+  margin: 0 0 0.25rem 0;
+}
+
+.chart-header p {
+  font-size: 0.85rem;
+  color: var(--text-muted);
+  margin: 0;
+}
+
+.chart-wrapper {
+  width: 100%;
+}
+
+.empty-chart-msg {
+  text-align: center;
+  padding: 4rem 1rem;
+  color: var(--text-muted);
+}
+
+.analytics-loading {
+  text-align: center;
+  padding: 6rem 1rem;
+  color: var(--text-muted);
+}
+
+@media (max-width: 1100px) {
+  .analytics-funnel-grid { grid-template-columns: repeat(2, 1fr); }
+  .analytics-charts-grid { grid-template-columns: 1fr; }
+  .analytics-charts-grid-two { grid-template-columns: 1fr; }
+}
+
+@media (max-width: 600px) {
+  .analytics-funnel-grid { grid-template-columns: 1fr; }
+}

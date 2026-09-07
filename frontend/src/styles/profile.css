@@ -1,0 +1,119 @@
+.settings-page-container {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  max-width: 860px;
+  margin: 0 auto;
+}
+
+.settings-card {
+  background-color: var(--bg-card);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-xl);
+  padding: 1.75rem;
+  box-shadow: var(--shadow-sm);
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
+.settings-card.danger-boundary {
+  border-color: rgba(239, 68, 68, 0.3);
+}
+
+.settings-card-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.settings-icon-title {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.settings-icon-title h3 {
+  font-size: 1.2rem;
+  margin: 0 0 0.2rem 0;
+}
+
+.settings-icon-title p {
+  font-size: 0.85rem;
+  color: var(--text-muted);
+  margin: 0;
+}
+
+.icon-blue { color: #3b82f6; }
+.icon-purple { color: #8b5cf6; }
+.icon-green { color: #10b981; }
+.icon-orange { color: #f59e0b; }
+.icon-danger { color: #ef4444; }
+
+.settings-form {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
+.password-options-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+
+.checkbox-label {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.85rem;
+  color: var(--text-muted);
+  cursor: pointer;
+}
+
+.checkbox-label input[type="checkbox"] {
+  width: 16px;
+  height: 16px;
+  cursor: pointer;
+}
+
+.inline-goal-form {
+  display: flex;
+  flex-direction: row;
+  align-items: flex-end;
+  gap: 1rem;
+}
+
+.inline-goal-form .form-group {
+  flex: 1;
+  max-width: 240px;
+}
+
+.theme-setting-row,
+.session-logout-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background-color: var(--bg-card-subtle);
+  border-radius: var(--radius-lg);
+  padding: 1.25rem;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+
+.theme-setting-row strong,
+.session-logout-row strong {
+  display: block;
+  font-size: 0.95rem;
+  color: var(--text-main);
+  margin-bottom: 0.2rem;
+}
+
+.theme-setting-row p,
+.session-logout-row p {
+  font-size: 0.85rem;
+  color: var(--text-muted);
+  margin: 0;
+}

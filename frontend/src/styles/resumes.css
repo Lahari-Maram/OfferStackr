@@ -1,0 +1,232 @@
+.resumes-page-container {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.resume-section-card {
+  background-color: var(--bg-card);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-xl);
+  padding: 1.75rem;
+  box-shadow: var(--shadow-sm);
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
+.section-card-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.section-card-header h3 {
+  font-size: 1.25rem;
+  margin: 0 0 0.25rem 0;
+}
+
+.section-card-header p {
+  font-size: 0.875rem;
+  color: var(--text-muted);
+  margin: 0;
+}
+
+.profile-resume-box {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background-color: var(--bg-card-subtle);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-lg);
+  padding: 1.25rem;
+}
+
+.resume-item-main {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.doc-icon {
+  color: var(--primary);
+  flex-shrink: 0;
+}
+
+.doc-meta {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+}
+
+.doc-meta strong {
+  font-size: 0.95rem;
+  color: var(--text-main);
+}
+
+.doc-meta span {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+}
+
+.resume-item-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+}
+
+.resume-empty-dropzone {
+  border: 2px dashed var(--border-strong);
+  border-radius: var(--radius-xl);
+  padding: 3rem 2rem;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.75rem;
+  background-color: var(--bg-card-subtle);
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.resume-empty-dropzone:hover {
+  border-color: var(--primary);
+  background-color: var(--primary-light);
+}
+
+.upload-icon {
+  color: var(--primary);
+}
+
+.resume-empty-dropzone h4 {
+  font-size: 1.1rem;
+  margin: 0;
+}
+
+.resume-empty-dropzone p {
+  font-size: 0.85rem;
+  color: var(--text-muted);
+  max-width: 420px;
+  margin: 0;
+}
+
+.app-resumes-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.85rem;
+}
+
+.app-resume-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background-color: var(--bg-card-subtle);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-lg);
+  padding: 1rem 1.25rem;
+  transition: all 0.15s ease;
+}
+
+.app-resume-item:hover {
+  border-color: var(--border-strong);
+  background-color: var(--bg-card);
+}
+
+.app-resume-info {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.app-company-badge {
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  color: var(--primary);
+  letter-spacing: 0.05em;
+}
+
+.app-file-name {
+  font-size: 0.95rem;
+  color: var(--text-main);
+}
+
+.app-meta {
+  font-size: 0.75rem;
+  color: var(--text-dim);
+}
+
+.app-resume-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+}
+
+.app-resumes-empty {
+  text-align: center;
+  padding: 3rem 1rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+  color: var(--text-muted);
+}
+
+/* Reports */
+.report-action-box {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background-color: var(--bg-card-subtle);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-lg);
+  padding: 1.5rem;
+}
+
+.report-icon-info {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.report-icon-info strong {
+  font-size: 1rem;
+  display: block;
+}
+
+.report-icon-info p {
+  font-size: 0.85rem;
+  color: var(--text-muted);
+  margin: 0.2rem 0 0 0;
+}
+
+.import-feedback-box {
+  background-color: var(--bg-card-subtle);
+  border-radius: var(--radius-lg);
+  padding: 1.25rem;
+  border-left: 4px solid var(--primary);
+}
+
+.import-feedback-box h4 {
+  margin: 0 0 0.4rem 0;
+  font-size: 0.95rem;
+}
+
+.import-feedback-box p {
+  margin: 0;
+  font-size: 0.875rem;
+  color: var(--text-muted);
+}
+
+.import-errors-list {
+  margin-top: 0.5rem;
+  padding-left: 1.25rem;
+  font-size: 0.8rem;
+  color: #ef4444;
+}
+
+@media (max-width: 768px) {
+  .profile-resume-box { flex-direction: column; align-items: flex-start; gap: 1rem; }
+  .app-resume-item { flex-direction: column; align-items: flex-start; gap: 1rem; }
+  .report-action-box { flex-direction: column; align-items: flex-start; gap: 1rem; }
+}

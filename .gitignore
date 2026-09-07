@@ -1,0 +1,40 @@
+# Environment & Secrets
+.env
+.env.*
+!.env.example
+
+# Databases
+*.db
+*.sqlite
+*.sqlite3
+
+# Uploads & User data (preserve folder structure via .gitkeep)
+backend/uploads/**/*
+!backend/uploads/**/
+!backend/uploads/**/.gitkeep
+backend/data/**/*
+!backend/data/**/
+!backend/data/**/.gitkeep
+
+# Build artifacts & dependencies
+frontend/dist/
+dist/
+build/
+node_modules/
+
+# Python Virtual Environments & Caches
+venv/
+.venv/
+env/
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.pytest_cache/
+
+# OS & Editor files
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+
