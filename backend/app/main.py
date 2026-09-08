@@ -28,32 +28,32 @@ app = FastAPI(
     version="2.0.0"
 )
 
-ENVIRONMENT = os.getenv("ENVIRONMENT", os.getenv("ENV", "development")).lower()
+# Default allowed origins (local dev + Render frontend production URL)
+DEFAULT_ORIGINS = [
+    "http://localhost:5173",
+    "http://127.0.0.1:5173",
+    "http://localhost:3000",
+    "http://localhost:80",
+    "http://localhost",
+    "https://offerstackr-frontend.onrender.com",
+]
+
 raw_origins = os.getenv("ALLOWED_ORIGINS", os.getenv("CORS_ORIGINS", "")).strip()
+allowed_origins = list(DEFAULT_ORIGINS)
 
 if raw_origins:
-    allowed_origins = [origin.strip() for origin in raw_origins.split(",") if origin.strip()]
-    allow_credentials = True
-elif ENVIRONMENT == "production":
-    allowed_origins = []
-    allow_credentials = True
-else:
-    allowed_origins = [
-        "http://localhost:5173",
-        "http://127.0.0.1:5173",
-        "http://localhost:3000",
-        "http://localhost:80",
-        "http://localhost",
-        "*"
-    ]
-    allow_credentials = False
+    for origin in raw_origins.split(","):
+        cleaned = origin.strip().rstrip("/")
+        if cleaned and cleaned not in allowed_origins:
+            allowed_origins.append(cleaned)
 
 app.add_middleware(
     CORSMiddleware,
     allow_origins=allowed_origins,
-    allow_credentials=allow_credentials,
+    allow_credentials=True,
     allow_methods=["*"],
-    allow_headers=["*"]
+    allow_headers=["*"],
+    expose_headers=["*"],
 )
 
 UPLOAD_DIR = Path(__file__).resolve().parent.parent / "uploads" / "resumes"

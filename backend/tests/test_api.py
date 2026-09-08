@@ -398,3 +398,69 @@ def test_user_data_isolation(test_user):
     # User B tries to delete User A's job -> should return 404
     delete_attempt = client.delete(f"/jobs/{job_a_id}", headers=user_b_headers)
     assert delete_attempt.status_code == 404
+
+# ================= CORS & PREFLIGHT TESTS =================
+
+def test_cors_preflight_signup():
+    origin = "https://offerstackr-frontend.onrender.com"
+    res = client.options("/signup", headers={
+        "Origin": origin,
+        "Access-Control-Request-Method": "POST",
+        "Access-Control-Request-Headers": "content-type"
+    })
+    assert res.status_code == 200
+    assert res.headers.get("access-control-allow-origin") == origin
+    assert res.headers.get("access-control-allow-credentials") == "true"
+
+def test_cors_signup_post():
+    origin = "https://offerstackr-frontend.onrender.com"
+    unique_id = uuid.uuid4().hex[:8]
+    res = client.post("/signup", json={
+        "name": f"CORS User {unique_id}",
+        "email": f"cors_{unique_id}@example.com",
+        "password": "Password123!"
+    }, headers={"Origin": origin})
+    assert res.status_code == 200
+    assert res.headers.get("access-control-allow-origin") == origin
+
+def test_cors_localhost_preflight():
+    origin = "http://localhost:5173"
+    res = client.options("/login", headers={
+        "Origin": origin,
+        "Access-Control-Request-Method": "POST",
+        "Access-Control-Request-Headers": "content-type"
+    })
+    assert res.status_code == 200
+    assert res.headers.get("access-control-allow-origin") == origin
+
+def test_cors_custom_allowed_origins():
+    from fastapi import FastAPI
+    from starlette.middleware.cors import CORSMiddleware
+    
+    test_app = FastAPI()
+    test_origins = [
+        "http://localhost:5173",
+        "https://offerstackr-frontend.onrender.com",
+    ]
+    raw = "https://custom-app.com/, https://preview.domain.org/"
+    for origin in raw.split(","):
+        cleaned = origin.strip().rstrip("/")
+        if cleaned and cleaned not in test_origins:
+            test_origins.append(cleaned)
+            
+    test_app.add_middleware(
+        CORSMiddleware,
+        allow_origins=test_origins,
+        allow_credentials=True,
+        allow_methods=["*"],
+        allow_headers=["*"],
+        expose_headers=["*"],
+    )
+    custom_client = TestClient(test_app)
+    res = custom_client.options("/", headers={
+        "Origin": "https://custom-app.com",
+        "Access-Control-Request-Method": "GET"
+    })
+    assert res.status_code == 200
+    assert res.headers.get("access-control-allow-origin") == "https://custom-app.com"
+    assert res.headers.get("access-control-allow-credentials") == "true"
