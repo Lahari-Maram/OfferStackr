@@ -270,7 +270,7 @@ export default function PublicHome() {
               <div className="public-logo-icon small">
                 <Sparkles size={16} />
               </div>
-              <span>OfferStackr</span>
+              <span className="public-logo-text">OfferStackr</span>
             </div>
             <p>Empowering candidates to land dream roles with organization and clarity.</p>
           </div>

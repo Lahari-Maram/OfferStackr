@@ -4,6 +4,8 @@ import "react-toastify/dist/ReactToastify.css";
 
 import { ThemeProvider } from "./context/ThemeContext";
 import ProtectedRoute from "./components/ProtectedRoute";
+import "./styles/public-navbar.css";
+import "./styles/public-home.css";
 
 import PublicHome from "./pages/PublicHome";
 import Login from "./pages/Login";
