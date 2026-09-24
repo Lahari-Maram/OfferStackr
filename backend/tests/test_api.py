@@ -464,3 +464,108 @@ def test_cors_custom_allowed_origins():
     assert res.status_code == 200
     assert res.headers.get("access-control-allow-origin") == "https://custom-app.com"
     assert res.headers.get("access-control-allow-credentials") == "true"
+
+def test_activity_calendar_endpoint(test_user):
+    headers = test_user["headers"]
+    # 1. Create jobs with applied dates
+    today = date.today()
+    client.post("/jobs", json={
+        "company": "Calendar Corp",
+        "role": "Software Engineer",
+        "status": "Applied",
+        "applied_date": str(today)
+    }, headers=headers)
+    
+    # 2. Get activity calendar for current year
+    res = client.get("/activity/calendar", headers=headers)
+    assert res.status_code == 200
+    data = res.json()
+    assert data["year"] == today.year
+    assert today.year in data["available_years"]
+    assert data["total_activities_year"] >= 1
+    assert data["total_applications_year"] >= 1
+    assert str(today) in data["daily_activity"]
+    assert data["daily_activity"][str(today)]["applications"] >= 1
+    
+    # 3. Test with a specific historical year (e.g. 2024)
+    res_2024 = client.get("/activity/calendar?year=2024", headers=headers)
+    assert res_2024.status_code == 200
+    assert res_2024.json()["year"] == 2024
+
+def test_avatar_lifecycle_and_validation(test_user):
+    headers = test_user["headers"]
+    
+    # 1. Initial user has no avatar
+    p_res = client.get("/profile", headers=headers)
+    assert p_res.status_code == 200
+    assert p_res.json()["avatar_url"] is None
+    
+    # 2. Reject non-image files (e.g. .txt or .pdf)
+    fake_txt = io.BytesIO(b"Hello world text file")
+    res_invalid = client.post(
+        "/profile/avatar",
+        files={"file": ("test.txt", fake_txt, "text/plain")},
+        headers=headers
+    )
+    assert res_invalid.status_code == 400
+    assert "Only JPG, PNG, and WebP" in res_invalid.json()["detail"]
+    
+    # 3. Reject invalid binary masquerading as PNG
+    fake_png = io.BytesIO(b"fake data not real png")
+    res_bad_png = client.post(
+        "/profile/avatar",
+        files={"file": ("fake.png", fake_png, "image/png")},
+        headers=headers
+    )
+    assert res_bad_png.status_code == 400
+    
+    # 4. Upload valid PNG avatar
+    # Minimal 1x1 valid PNG
+    valid_png_bytes = (
+        b"\x89PNG\r\n\x1a\n\x00\x00\x00\rIHDR\x00\x00\x00\x01\x00\x00\x00\x01\x08\x06\x00\x00\x00\x1f\x15c4"
+        b"\x00\x00\x00\nIDATx\x9cc\x00\x01\x00\x00\x05\x00\x01\r\n-\xb4\x00\x00\x00\x00IEND\xaeB`\x82"
+    )
+    png_file = io.BytesIO(valid_png_bytes)
+    res_upload = client.post(
+        "/profile/avatar",
+        files={"file": ("avatar.png", png_file, "image/png")},
+        headers=headers
+    )
+    assert res_upload.status_code == 200
+    avatar_url = res_upload.json()["avatar_url"]
+    assert avatar_url is not None
+    assert avatar_url.startswith("/uploads/avatars/")
+    
+    # 5. Fetch avatar file
+    res_file = client.get(avatar_url)
+    assert res_file.status_code == 200
+    assert res_file.headers.get("content-type") == "image/png"
+    assert len(res_file.content) == len(valid_png_bytes)
+    
+    # 6. Profile reflects avatar
+    p_res2 = client.get("/profile", headers=headers)
+    assert p_res2.status_code == 200
+    assert p_res2.json()["avatar_url"] == avatar_url
+    
+    # 7. Replace avatar with valid JPEG
+    valid_jpeg_bytes = b"\xff\xd8\xff\xe0\x00\x10JFIF\x00\x01\x01\x00\x00\x01\x00\x01\x00\x00\xff\xdb\x00C\x00\xff\xc0\x00\x0b\x08\x00\x01\x00\x01\x01\x01\x11\x00\xff\xda\x00\x08\x01\x01\x00\x00?\x00\xbf\x00\xff\xd9"
+    jpeg_file = io.BytesIO(valid_jpeg_bytes)
+    res_replace = client.post(
+        "/profile/avatar",
+        files={"file": ("photo.jpg", jpeg_file, "image/jpeg")},
+        headers=headers
+    )
+    assert res_replace.status_code == 200
+    new_avatar_url = res_replace.json()["avatar_url"]
+    assert new_avatar_url is not None
+    assert new_avatar_url != avatar_url
+    
+    # 8. Delete avatar
+    res_del = client.delete("/profile/avatar", headers=headers)
+    assert res_del.status_code == 200
+    assert res_del.json()["avatar_url"] is None
+    
+    # 9. Verify profile shows None
+    p_res3 = client.get("/profile", headers=headers)
+    assert p_res3.json()["avatar_url"] is None
+

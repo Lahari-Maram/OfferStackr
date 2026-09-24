@@ -1,0 +1,40 @@
+<svg width="32" height="32" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="fav-bg" x1="0" y1="0" x2="32" y2="32" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#1E1035" />
+      <stop offset="100%" stop-color="#130924" />
+    </linearGradient>
+    <linearGradient id="fav-violet" x1="4" y1="4" x2="20" y2="28" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#818CF8" />
+      <stop offset="50%" stop-color="#6366F1" />
+      <stop offset="100%" stop-color="#4F46E5" />
+    </linearGradient>
+    <linearGradient id="fav-cyan" x1="12" y1="28" x2="28" y2="4" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#0891B2" />
+      <stop offset="50%" stop-color="#06B6D4" />
+      <stop offset="100%" stop-color="#22D3EE" />
+    </linearGradient>
+  </defs>
+
+  <!-- Background rounded squircle for browser tab visibility -->
+  <rect width="32" height="32" rx="8" fill="url(#fav-bg)" />
+  
+  <!-- Deep Violet / Indigo Pipeline Arc -->
+  <path
+    d="M 20.5 6.5 C 16.2 4.2 10.5 4.8 6.8 8.5 C 2.8 12.5 2.8 19.5 6.8 23.5 C 10.2 26.9 15.5 27.5 19.8 25.5"
+    stroke="url(#fav-violet)"
+    stroke-width="3.6"
+    stroke-linecap="round"
+  />
+
+  <!-- Vivid Cyan / Teal Ascending Progression Arc -->
+  <path
+    d="M 13.5 26.8 C 18.2 28.2 23.5 26.8 26.8 22.8 C 30.5 18.2 29.8 11.2 25.2 7.2 C 23.8 6.0 22.0 5.2 20.2 4.8"
+    stroke="url(#fav-cyan)"
+    stroke-width="3.6"
+    stroke-linecap="round"
+  />
+
+  <!-- Vivid Cyan Offer Apex Node -->
+  <circle cx="20.5" cy="4.8" r="2.2" fill="#22D3EE" />
+</svg>

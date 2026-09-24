@@ -56,13 +56,13 @@
   width: 48px;
   height: 48px;
   border-radius: var(--radius-lg);
-  background: linear-gradient(135deg, #2563eb, #8b5cf6);
-  color: #ffffff;
+  background: linear-gradient(135deg, #1E1035, #2D1445);
   display: flex;
   align-items: center;
   justify-content: center;
   margin-bottom: 1.5rem;
-  box-shadow: 0 4px 14px rgba(37, 99, 235, 0.35);
+  box-shadow: 0 4px 14px rgba(30, 16, 53, 0.25);
+  border: 1px solid rgba(255, 255, 255, 0.08);
 }
 
 .auth-heading {
@@ -117,7 +117,7 @@
 .auth-forgot-link {
   font-size: 0.8rem;
   font-weight: 600;
-  color: var(--primary);
+  color: #1E1035;
 }
 
 .auth-forgot-link:hover {
@@ -165,21 +165,36 @@
   align-items: center;
   justify-content: center;
   gap: 0.5rem;
-  background: linear-gradient(135deg, #2563eb, #1d4ed8);
+  background-color: #1E1035;
   color: #ffffff;
   padding: 0.75rem 1.5rem;
   border-radius: var(--radius-md);
   font-size: 0.95rem;
   font-weight: 600;
-  box-shadow: 0 2px 8px rgba(37, 99, 235, 0.3);
+  box-shadow: 0 2px 8px rgba(30, 16, 53, 0.25);
   transition: all 0.2s ease;
   margin-top: 0.5rem;
 }
 
 .auth-primary-btn:hover:not(:disabled) {
-  background: linear-gradient(135deg, #1d4ed8, #1e40af);
-  box-shadow: 0 4px 12px rgba(37, 99, 235, 0.45);
+  background-color: #2E1065;
+  box-shadow: 0 4px 12px rgba(30, 16, 53, 0.35);
   transform: translateY(-1px);
+}
+
+[data-theme="dark"] .auth-primary-btn {
+  background-color: #6366F1;
+  color: #ffffff;
+  box-shadow: 0 2px 8px rgba(99, 102, 241, 0.4);
+}
+
+[data-theme="dark"] .auth-primary-btn:hover:not(:disabled) {
+  background-color: #4F46E5;
+  box-shadow: 0 4px 12px rgba(99, 102, 241, 0.55);
+}
+
+[data-theme="dark"] .auth-forgot-link {
+  color: #A5B4FC;
 }
 
 .auth-primary-btn:disabled {
@@ -189,18 +204,87 @@
 
 .auth-switch {
   text-align: center;
-  font-size: 0.875rem;
+  font-size: 0.9rem;
   color: var(--text-muted);
   margin-top: 1.75rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.4rem;
+  flex-wrap: wrap;
 }
 
 .auth-switch a {
-  color: var(--primary);
-  font-weight: 600;
+  color: #0891B2;
+  font-weight: 700;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  padding: 0.15rem 0.5rem;
+  border-radius: var(--radius-sm);
+  background: #ECFEFF;
+  border: 1px solid rgba(6, 182, 212, 0.25);
+  transition: all 0.2s ease;
+  display: inline-flex;
+  align-items: center;
 }
 
 .auth-switch a:hover {
-  text-decoration: underline;
+  background: #0891B2;
+  color: #ffffff;
+  border-color: #0891B2;
+  text-decoration: none;
+  box-shadow: 0 2px 8px rgba(8, 145, 178, 0.35);
+}
+
+[data-theme="dark"] .auth-switch a {
+  color: #22D3EE;
+  background: rgba(6, 182, 212, 0.18);
+  border-color: rgba(6, 182, 212, 0.35);
+}
+
+[data-theme="dark"] .auth-switch a:hover {
+  background: #06B6D4;
+  color: #ffffff;
+}
+
+.auth-footer-link {
+  display: flex;
+  justify-content: center;
+  margin-top: 1.5rem;
+}
+
+.back-to-login {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  color: #6366F1;
+  font-weight: 700;
+  font-size: 0.875rem;
+  padding: 0.35rem 0.75rem;
+  border-radius: var(--radius-md);
+  background: rgba(99, 102, 241, 0.08);
+  border: 1px solid rgba(99, 102, 241, 0.2);
+  transition: all 0.2s ease;
+  cursor: pointer;
+}
+
+.back-to-login:hover {
+  background: #6366F1;
+  color: #ffffff;
+  border-color: #6366F1;
+  box-shadow: 0 2px 8px rgba(99, 102, 241, 0.35);
+  transform: translateX(-2px);
+}
+
+[data-theme="dark"] .back-to-login {
+  color: #A5B4FC;
+  background: rgba(99, 102, 241, 0.15);
+  border-color: rgba(99, 102, 241, 0.3);
+}
+
+[data-theme="dark"] .back-to-login:hover {
+  background: #6366F1;
+  color: #ffffff;
 }
 
 /* OTP Steps Styling */

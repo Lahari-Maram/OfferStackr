@@ -53,6 +53,10 @@
   flex-shrink: 0;
 }
 
+[data-theme="dark"] .doc-icon {
+  color: #A5B4FC;
+}
+
 .doc-meta {
   display: flex;
   flex-direction: column;
@@ -94,8 +98,17 @@
   background-color: var(--primary-light);
 }
 
+[data-theme="dark"] .resume-empty-dropzone:hover {
+  border-color: #6366F1;
+  background-color: rgba(99, 102, 241, 0.12);
+}
+
 .upload-icon {
   color: var(--primary);
+}
+
+[data-theme="dark"] .upload-icon {
+  color: #A5B4FC;
 }
 
 .resume-empty-dropzone h4 {

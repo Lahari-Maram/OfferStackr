@@ -10,6 +10,7 @@ class User(Base):
     email = Column(String, unique=True, index=True, nullable=False)
     hashed_password = Column(String, nullable=False)
     weekly_goal = Column(Integer, nullable=False, default=10)
+    avatar_url = Column(String, nullable=True)
     created_at = Column(DateTime, default=datetime.utcnow, nullable=False)
 
     jobs = relationship("Job", back_populates="owner", cascade="all, delete-orphan")

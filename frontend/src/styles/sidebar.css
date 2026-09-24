@@ -31,19 +31,18 @@
   width: 36px;
   height: 36px;
   border-radius: var(--radius-md);
-  background: linear-gradient(135deg, #2563eb, #8b5cf6);
+  background: linear-gradient(135deg, #1E1035, #2D1445);
   display: flex;
   align-items: center;
   justify-content: center;
-  color: #ffffff;
   flex-shrink: 0;
-  box-shadow: 0 4px 10px rgba(37, 99, 235, 0.3);
+  box-shadow: 0 4px 10px rgba(30, 16, 53, 0.25);
+  border: 1px solid rgba(255, 255, 255, 0.08);
 }
 
 .brand-text {
   display: flex;
   align-items: center;
-  gap: 0.4rem;
   flex: 1;
   min-width: 0;
 }
@@ -54,15 +53,6 @@
   font-size: 1.15rem;
   color: var(--text-main);
   letter-spacing: -0.03em;
-}
-
-.brand-badge {
-  font-size: 0.65rem;
-  font-weight: 800;
-  background: rgba(37, 99, 235, 0.1);
-  color: var(--primary);
-  padding: 0.15rem 0.4rem;
-  border-radius: var(--radius-sm);
 }
 
 .sidebar-collapse-btn {
@@ -130,14 +120,14 @@
 }
 
 .nav-item.active {
-  background-color: var(--primary-light);
-  color: var(--primary);
+  background-color: #ECFEFF;
+  color: #0891B2;
   font-weight: 600;
 }
 
-.nav-item-highlight {
-  color: var(--primary);
-  background-color: rgba(37, 99, 235, 0.06);
+[data-theme="dark"] .nav-item.active {
+  background-color: rgba(6, 182, 212, 0.18);
+  color: #22D3EE;
 }
 
 .nav-icon {
@@ -155,6 +145,55 @@
 .sidebar-footer {
   padding: 0.75rem;
   border-top: 1px solid var(--border-subtle);
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+
+.sidebar-user-pill {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.5rem 0.65rem;
+  border-radius: var(--radius-md);
+  color: var(--text-main);
+  text-decoration: none;
+  transition: all 0.15s ease;
+  overflow: hidden;
+}
+
+.sidebar-user-pill:hover,
+.sidebar-user-pill.active {
+  background-color: var(--bg-card-subtle);
+}
+
+.sidebar-user-details {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  flex: 1;
+}
+
+.sidebar-user-name {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--text-main);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.sidebar-user-role {
+  font-size: 0.72rem;
+  color: var(--text-muted);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.sidebar.collapsed .sidebar-user-pill {
+  justify-content: center;
+  padding: 0.5rem;
 }
 
 .logout-button {

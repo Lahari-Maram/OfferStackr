@@ -46,6 +46,11 @@
   color: var(--primary);
 }
 
+[data-theme="dark"] .filter-tab.active {
+  background-color: rgba(99, 102, 241, 0.2);
+  color: #A5B4FC;
+}
+
 .interview-cards-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(360px, 1fr));
@@ -88,6 +93,10 @@
   letter-spacing: 0.06em;
   color: var(--primary);
   display: block;
+}
+
+[data-theme="dark"] .interview-company {
+  color: #A5B4FC;
 }
 
 .interview-round-title {
@@ -147,6 +156,16 @@
 .meeting-url-btn:hover {
   background: var(--primary);
   color: #ffffff;
+}
+
+[data-theme="dark"] .meeting-url-btn {
+  background-color: rgba(99, 102, 241, 0.18);
+  color: #A5B4FC;
+}
+
+[data-theme="dark"] .meeting-url-btn:hover {
+  background-color: #6366F1;
+  color: #FFFFFF;
 }
 
 .notes-box {

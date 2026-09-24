@@ -60,6 +60,8 @@ UPLOAD_DIR = Path(__file__).resolve().parent.parent / "uploads" / "resumes"
 UPLOAD_DIR.mkdir(parents=True, exist_ok=True)
 APPLICATION_RESUME_DIR = Path(__file__).resolve().parent.parent / "uploads" / "application_resumes"
 APPLICATION_RESUME_DIR.mkdir(parents=True, exist_ok=True)
+UPLOAD_AVATARS_DIR = Path(__file__).resolve().parent.parent / "uploads" / "avatars"
+UPLOAD_AVATARS_DIR.mkdir(parents=True, exist_ok=True)
 
 # ================= SAFE INCREMENTAL DB MIGRATION =================
 
@@ -77,6 +79,8 @@ def migrate_existing_db():
         with engine.begin() as conn:
             if "weekly_goal" not in cols:
                 conn.execute(text("ALTER TABLE users ADD COLUMN weekly_goal INTEGER NOT NULL DEFAULT 10"))
+            if "avatar_url" not in cols:
+                conn.execute(text("ALTER TABLE users ADD COLUMN avatar_url VARCHAR"))
             if "created_at" not in cols:
                 conn.execute(text("ALTER TABLE users ADD COLUMN created_at DATETIME"))
                 
@@ -193,6 +197,7 @@ def serialize_user(user: models.User):
         "email": user.email,
         "weekly_goal": user.weekly_goal or 10,
         "has_resume": user.resume is not None,
+        "avatar_url": user.avatar_url,
         "created_at": user.created_at
     }
 
@@ -301,6 +306,88 @@ def update_profile(profile_data: schemas.UpdateProfile, current_user: models.Use
     db.commit()
     db.refresh(current_user)
     return serialize_user(current_user)
+
+ALLOWED_AVATAR_EXTENSIONS = {".jpg", ".jpeg", ".png", ".webp"}
+ALLOWED_AVATAR_MIMES = {"image/jpeg", "image/png", "image/webp", "image/jpg"}
+MAX_AVATAR_SIZE_BYTES = 5 * 1024 * 1024  # 5 MB
+
+def _validate_avatar_upload(file: UploadFile, data: bytes):
+    ext = Path(file.filename or "").suffix.lower()
+    if ext not in ALLOWED_AVATAR_EXTENSIONS:
+        raise HTTPException(status_code=400, detail="Only JPG, PNG, and WebP image files are allowed.")
+    if file.content_type and file.content_type.lower() not in ALLOWED_AVATAR_MIMES and not file.content_type.startswith("image/"):
+        raise HTTPException(status_code=400, detail="Only JPG, PNG, and WebP image files are allowed.")
+    if len(data) > MAX_AVATAR_SIZE_BYTES:
+        raise HTTPException(status_code=400, detail="Profile photo must be 5 MB or smaller.")
+    if len(data) == 0:
+        raise HTTPException(status_code=400, detail="The uploaded file is empty.")
+    # Magic bytes verification for image headers
+    is_jpeg = data.startswith(b"\xff\xd8\xff")
+    is_png = data.startswith(b"\x89PNG\r\n\x1a\n")
+    is_webp = data.startswith(b"RIFF") and b"WEBP" in data[:16]
+    if not (is_jpeg or is_png or is_webp):
+        raise HTTPException(status_code=400, detail="The uploaded file is not a valid image format.")
+    return ext
+
+@app.post("/profile/avatar", response_model=schemas.UserResponse, tags=["Profile"])
+async def upload_avatar(file: UploadFile = File(...), current_user: models.User = Depends(get_current_user), db: Session = Depends(get_db)):
+    data = await file.read()
+    ext = _validate_avatar_upload(file, data)
+    
+    # Remove old avatar file if present
+    if current_user.avatar_url and "/uploads/avatars/" in current_user.avatar_url:
+        old_filename = Path(current_user.avatar_url).name
+        old_path = UPLOAD_AVATARS_DIR / old_filename
+        if old_path.exists() and old_path.is_file():
+            try:
+                old_path.unlink()
+            except Exception:
+                pass
+                
+    stored_filename = f"avatar_user_{current_user.id}_{uuid.uuid4().hex[:12]}{ext}"
+    target_path = UPLOAD_AVATARS_DIR / stored_filename
+    target_path.write_bytes(data)
+    
+    current_user.avatar_url = f"/uploads/avatars/{stored_filename}"
+    db.commit()
+    db.refresh(current_user)
+    
+    add_event(db, current_user.id, None, "avatar_updated", "Updated profile photo")
+    return serialize_user(current_user)
+
+@app.delete("/profile/avatar", response_model=schemas.UserResponse, tags=["Profile"])
+def delete_avatar(current_user: models.User = Depends(get_current_user), db: Session = Depends(get_db)):
+    if current_user.avatar_url and "/uploads/avatars/" in current_user.avatar_url:
+        old_filename = Path(current_user.avatar_url).name
+        old_path = UPLOAD_AVATARS_DIR / old_filename
+        if old_path.exists() and old_path.is_file():
+            try:
+                old_path.unlink()
+            except Exception:
+                pass
+                
+    current_user.avatar_url = None
+    db.commit()
+    db.refresh(current_user)
+    
+    add_event(db, current_user.id, None, "avatar_removed", "Removed profile photo")
+    return serialize_user(current_user)
+
+@app.get("/uploads/avatars/{filename}", tags=["Profile"])
+def get_avatar_file(filename: str):
+    safe_filename = Path(filename).name
+    path = UPLOAD_AVATARS_DIR / safe_filename
+    if not path.exists() or not path.is_file():
+        raise HTTPException(status_code=404, detail="Profile photo not found")
+        
+    ext = path.suffix.lower()
+    media_types = {
+        ".jpg": "image/jpeg",
+        ".jpeg": "image/jpeg",
+        ".png": "image/png",
+        ".webp": "image/webp",
+    }
+    return FileResponse(path, media_type=media_types.get(ext, "image/jpeg"))
 
 @app.put("/change-password", response_model=schemas.MessageResponse, tags=["Profile"])
 def change_password(data: schemas.ChangePassword, current_user: models.User = Depends(get_current_user), db: Session = Depends(get_db)):
@@ -1635,6 +1722,156 @@ def get_streak(current_user: models.User = Depends(get_current_user), db: Sessio
         "longest_streak": max(longest_streak, streak),
         "total_active_days": len(dates),
         "activity_dates": [str(d) for d in dates]
+    }
+
+@app.get("/activity/calendar", response_model=schemas.ActivityCalendarResponse, tags=["Dashboard"])
+def get_activity_calendar(
+    year: int | None = None,
+    current_user: models.User = Depends(get_current_user),
+    db: Session = Depends(get_db)
+):
+    today = date.today()
+    current_year = today.year
+    selected_year = year if year is not None else current_year
+
+    jobs = db.query(models.Job).filter(models.Job.user_id == current_user.id).all()
+    interviews = db.query(models.Interview).filter(models.Interview.user_id == current_user.id).all()
+    assessments = db.query(models.Assessment).filter(models.Assessment.user_id == current_user.id).all()
+
+    # Discover all distinct years
+    years_set = {current_year}
+    for j in jobs:
+        if j.applied_date:
+            years_set.add(j.applied_date.year)
+        if j.interview_date:
+            years_set.add(j.interview_date.year)
+        if j.assessment_date:
+            years_set.add(j.assessment_date.year)
+    for i in interviews:
+        if i.interview_date:
+            years_set.add(i.interview_date.year)
+    for a in assessments:
+        if a.assessment_date:
+            years_set.add(a.assessment_date.year)
+
+    available_years = sorted(list(years_set), reverse=True)
+
+    # All-time streak calculation across all activity dates
+    all_active_dates = set()
+    for j in jobs:
+        if j.applied_date:
+            all_active_dates.add(j.applied_date)
+    for i in interviews:
+        if i.interview_date:
+            all_active_dates.add(i.interview_date)
+    for a in assessments:
+        if a.assessment_date:
+            all_active_dates.add(a.assessment_date)
+
+    sorted_all_dates = sorted(list(all_active_dates))
+    streak = 0
+    cursor = today
+    while cursor in all_active_dates:
+        streak += 1
+        cursor -= timedelta(days=1)
+    if today not in all_active_dates:
+        cursor = today - timedelta(days=1)
+        streak = 0
+        while cursor in all_active_dates:
+            streak += 1
+            cursor -= timedelta(days=1)
+
+    longest_streak = 0
+    cur_run = 0
+    if sorted_all_dates:
+        for i in range(len(sorted_all_dates)):
+            if i == 0 or sorted_all_dates[i] == sorted_all_dates[i - 1] + timedelta(days=1):
+                cur_run += 1
+            else:
+                cur_run = 1
+            longest_streak = max(longest_streak, cur_run)
+
+    # Activity for selected_year
+    daily_activity: dict[str, schemas.ActivityDaySummary] = {}
+    monthly_counts = {str(m): 0 for m in range(1, 13)}
+    total_activities_year = 0
+    total_applications_year = 0
+    active_days_year_set = set()
+
+    def get_or_create_day(d_str: str) -> schemas.ActivityDaySummary:
+        if d_str not in daily_activity:
+            daily_activity[d_str] = schemas.ActivityDaySummary(
+                date=d_str,
+                applications=0,
+                interviews=0,
+                assessments=0,
+                total=0,
+                items=[]
+            )
+        return daily_activity[d_str]
+
+    for j in jobs:
+        if j.applied_date and j.applied_date.year == selected_year:
+            d_str = str(j.applied_date)
+            day = get_or_create_day(d_str)
+            day.applications += 1
+            day.total += 1
+            day.items.append(schemas.ActivityDayItem(
+                type="application",
+                title=f"Applied to {j.company}",
+                subtitle=j.role or "Position",
+                status=j.status or "Applied"
+            ))
+            monthly_counts[str(j.applied_date.month)] += 1
+            total_activities_year += 1
+            total_applications_year += 1
+            active_days_year_set.add(d_str)
+
+    job_map = {j.id: j.company for j in jobs}
+
+    for i in interviews:
+        if i.interview_date and i.interview_date.year == selected_year:
+            d_str = str(i.interview_date)
+            day = get_or_create_day(d_str)
+            day.interviews += 1
+            day.total += 1
+            day.items.append(schemas.ActivityDayItem(
+                type="interview",
+                title=f"Interview with {job_map.get(i.job_id, 'Company')}",
+                subtitle=i.round_name or "Interview Round",
+                status=i.status or "Scheduled"
+            ))
+            monthly_counts[str(i.interview_date.month)] += 1
+            total_activities_year += 1
+            active_days_year_set.add(d_str)
+
+    for a in assessments:
+        if a.assessment_date and a.assessment_date.year == selected_year:
+            d_str = str(a.assessment_date)
+            day = get_or_create_day(d_str)
+            day.assessments += 1
+            day.total += 1
+            day.items.append(schemas.ActivityDayItem(
+                type="assessment",
+                title=f"Assessment: {a.name}",
+                subtitle=f"Platform: {a.platform or 'Online'}",
+                status="Completed" if a.completed else "Pending"
+            ))
+            monthly_counts[str(a.assessment_date.month)] += 1
+            total_activities_year += 1
+            active_days_year_set.add(d_str)
+
+    return {
+        "year": selected_year,
+        "available_years": available_years,
+        "total_activities_year": total_activities_year,
+        "total_active_days_year": len(active_days_year_set),
+        "total_applications_year": total_applications_year,
+        "current_streak": streak,
+        "longest_streak": max(longest_streak, streak),
+        "total_active_days_all_time": len(sorted_all_dates),
+        "daily_activity": daily_activity,
+        "monthly_counts": monthly_counts
     }
 
 @app.get("/achievements", response_model=list[schemas.AchievementResponse], tags=["Dashboard"])

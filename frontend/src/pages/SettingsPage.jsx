@@ -12,18 +12,31 @@ import {
   Upload,
   Download,
   Trash2,
-  RefreshCw
+  RefreshCw,
+  Camera,
+  Check,
+  Plus
 } from "lucide-react";
 import api from "../api/axios";
 import Layout from "../components/Layout";
 import ConfirmModal from "../components/ConfirmModal";
+import UserAvatar from "../components/UserAvatar";
 import { useTheme } from "../context/ThemeContext";
+import { useUser } from "../context/UserContext";
 import "../styles/profile.css";
 
 export default function SettingsPage() {
   const navigate = useNavigate();
   const { theme, toggleTheme } = useTheme();
+  const { user, updateUser, uploadAvatar, removeAvatar, logout } = useUser();
   
+  // Profile Photo State
+  const [selectedAvatarFile, setSelectedAvatarFile] = useState(null);
+  const [avatarPreview, setAvatarPreview] = useState(null);
+  const [avatarUploading, setAvatarUploading] = useState(false);
+  const [showDeleteAvatarModal, setShowDeleteAvatarModal] = useState(false);
+  const photoInputRef = useRef(null);
+
   // Profile Info
   const [profile, setProfile] = useState({ name: "", email: "" });
   const [profileSaving, setProfileSaving] = useState(false);
@@ -57,6 +70,7 @@ export default function SettingsPage() {
         api.get("/resume").catch(() => ({ data: null }))
       ]);
       setProfile({ name: pRes.data.name || "", email: pRes.data.email || "" });
+      updateUser(pRes.data);
       setGoal(pRes.data.weekly_goal || 10);
       setResume(rRes.data);
     } catch {
@@ -67,6 +81,87 @@ export default function SettingsPage() {
   useEffect(() => {
     loadSettingsData();
   }, []);
+
+  const handleSelectAvatarFile = (e) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    // 1. Validation: File type (JPG, PNG, WebP)
+    const validTypes = ["image/jpeg", "image/png", "image/webp", "image/jpg"];
+    const fileExtension = file.name.split(".").pop()?.toLowerCase();
+    const validExtensions = ["jpg", "jpeg", "png", "webp"];
+
+    if (!validTypes.includes(file.type.toLowerCase()) && !validExtensions.includes(fileExtension)) {
+      toast.error("Unsupported file format. Please upload a JPG, PNG, or WebP image.");
+      e.target.value = "";
+      return;
+    }
+
+    // 2. Validation: File size (5 MB max)
+    const MAX_SIZE = 5 * 1024 * 1024;
+    if (file.size > MAX_SIZE) {
+      toast.error("Image file is too large. Maximum allowed file size is 5 MB.");
+      e.target.value = "";
+      return;
+    }
+
+    if (file.size === 0) {
+      toast.error("The selected image file is empty. Please choose a valid image.");
+      e.target.value = "";
+      return;
+    }
+
+    setSelectedAvatarFile(file);
+    const previewUrl = URL.createObjectURL(file);
+    setAvatarPreview(previewUrl);
+    e.target.value = "";
+  };
+
+  const handleSaveAvatar = async () => {
+    if (!selectedAvatarFile) return;
+    try {
+      setAvatarUploading(true);
+      await uploadAvatar(selectedAvatarFile);
+      if (avatarPreview) {
+        URL.revokeObjectURL(avatarPreview);
+      }
+      setSelectedAvatarFile(null);
+      setAvatarPreview(null);
+      toast.success("Profile photo updated successfully!");
+    } catch (error) {
+      const errDetail = error.response?.data?.detail;
+      toast.error(typeof errDetail === "string" ? errDetail : "Failed to upload profile photo");
+    } finally {
+      setAvatarUploading(false);
+    }
+  };
+
+  const handleCancelAvatarPreview = () => {
+    if (avatarPreview) {
+      URL.revokeObjectURL(avatarPreview);
+    }
+    setSelectedAvatarFile(null);
+    setAvatarPreview(null);
+  };
+
+  const handleRemoveAvatar = async () => {
+    try {
+      setAvatarUploading(true);
+      if (avatarPreview) {
+        URL.revokeObjectURL(avatarPreview);
+      }
+      setSelectedAvatarFile(null);
+      setAvatarPreview(null);
+      await removeAvatar();
+      setShowDeleteAvatarModal(false);
+      toast.success("Profile photo removed. Reverted to default avatar.");
+    } catch (error) {
+      const errDetail = error.response?.data?.detail;
+      toast.error(typeof errDetail === "string" ? errDetail : "Failed to remove profile photo");
+    } finally {
+      setAvatarUploading(false);
+    }
+  };
 
   const handleUpdateProfile = async (e) => {
     e.preventDefault();
@@ -81,6 +176,7 @@ export default function SettingsPage() {
         email: profile.email.trim().toLowerCase()
       });
       setProfile({ name: res.data.name, email: res.data.email });
+      updateUser(res.data);
       toast.success("Profile information updated!");
     } catch (error) {
       const errDetail = error.response?.data?.detail;
@@ -176,7 +272,7 @@ export default function SettingsPage() {
   };
 
   const handleLogout = () => {
-    localStorage.removeItem("token");
+    logout();
     toast.success("Logged out successfully");
     navigate("/login");
   };
@@ -192,7 +288,123 @@ export default function SettingsPage() {
           </div>
         </div>
 
-        {/* SECTION 1: PROFILE INFO */}
+        {/* SECTION 1: PROFILE PHOTO / AVATAR */}
+        <div className="settings-card">
+          <div className="settings-card-header">
+            <div className="settings-icon-title">
+              <Camera size={20} className="icon-cyan" />
+              <div>
+                <h3>Profile Photo</h3>
+                <p>Upload a custom avatar or use your default branded OfferStackr identity.</p>
+              </div>
+            </div>
+          </div>
+
+          <div className="profile-avatar-row">
+            <div className="avatar-preview-box">
+              <div
+                className="avatar-preview-wrapper"
+                onClick={() => photoInputRef.current?.click()}
+                title="Click to choose profile photo"
+              >
+                <UserAvatar
+                  src={avatarPreview || user?.avatar_url}
+                  name={profile.name || user?.name}
+                  size="2xl"
+                />
+                <button
+                  type="button"
+                  className="avatar-plus-btn"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    photoInputRef.current?.click();
+                  }}
+                  title="Upload / Change Photo"
+                  aria-label="Upload / Change Photo"
+                >
+                  <Plus size={16} />
+                </button>
+              </div>
+
+              {avatarUploading && (
+                <div className="avatar-busy-spinner">
+                  <RefreshCw size={24} className="spin-icon" />
+                </div>
+              )}
+            </div>
+
+            <div className="avatar-actions-meta">
+              <div className="avatar-status-badge">
+                <strong>
+                  {avatarPreview
+                    ? "New photo selected (Unsaved preview)"
+                    : user?.avatar_url
+                    ? "Custom profile photo active"
+                    : "Default avatar active"}
+                </strong>
+                <span>Supports JPG, PNG, or WebP. Max file size: 5 MB.</span>
+              </div>
+
+              <div className="avatar-button-group">
+                {avatarPreview ? (
+                  <>
+                    <button
+                      type="button"
+                      className="btn btn-primary btn-sm"
+                      onClick={handleSaveAvatar}
+                      disabled={avatarUploading}
+                    >
+                      <Check size={14} />
+                      {avatarUploading ? "Saving..." : "Save Photo"}
+                    </button>
+                    <button
+                      type="button"
+                      className="btn btn-secondary btn-sm"
+                      onClick={handleCancelAvatarPreview}
+                      disabled={avatarUploading}
+                    >
+                      Cancel
+                    </button>
+                  </>
+                ) : (
+                  <>
+                    <button
+                      type="button"
+                      className="btn btn-primary btn-sm"
+                      onClick={() => photoInputRef.current?.click()}
+                      disabled={avatarUploading}
+                    >
+                      <Upload size={14} />
+                      {user?.avatar_url ? "Replace Photo" : "Choose Photo"}
+                    </button>
+
+                    {user?.avatar_url && (
+                      <button
+                        type="button"
+                        className="btn btn-danger-subtle btn-sm"
+                        onClick={() => setShowDeleteAvatarModal(true)}
+                        disabled={avatarUploading}
+                      >
+                        <Trash2 size={14} />
+                        Remove Photo
+                      </button>
+                    )}
+                  </>
+                )}
+
+                <input
+                  ref={photoInputRef}
+                  type="file"
+                  accept="image/jpeg,image/png,image/webp,image/jpg"
+                  style={{ display: "none" }}
+                  onChange={handleSelectAvatarFile}
+                />
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* SECTION 2: PROFILE INFO */}
         <div className="settings-card">
           <div className="settings-card-header">
             <div className="settings-icon-title">
@@ -468,6 +680,17 @@ export default function SettingsPage() {
           type="danger"
           onConfirm={handleDeleteResume}
           onCancel={() => setShowDeleteResumeModal(false)}
+        />
+
+        {/* DELETE AVATAR CONFIRM */}
+        <ConfirmModal
+          isOpen={showDeleteAvatarModal}
+          title="Remove Profile Photo"
+          message="Are you sure you want to remove your custom profile photo? Your account will revert to the default OfferStackr avatar."
+          confirmText="Remove Photo"
+          type="danger"
+          onConfirm={handleRemoveAvatar}
+          onCancel={() => setShowDeleteAvatarModal(false)}
         />
       </div>
     </Layout>

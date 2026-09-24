@@ -556,7 +556,7 @@ export default function Jobs() {
               onClick={() => navigate("/add-job")}
             >
               <Plus size={16} />
-              <span>Add Job</span>
+              <span>Add Application</span>
             </button>
           </div>
         </div>

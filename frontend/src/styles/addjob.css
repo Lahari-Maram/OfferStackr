@@ -77,6 +77,16 @@
   background-color: var(--bg-card);
 }
 
+[data-theme="dark"] .form-tab.active {
+  color: #A5B4FC;
+  border-bottom-color: #6366F1;
+  background-color: var(--bg-card);
+}
+
+[data-theme="dark"] .btn-back:hover {
+  color: #A5B4FC;
+}
+
 .form-section-body {
   padding: 2rem;
   display: flex;
@@ -137,8 +147,17 @@
   background-color: var(--primary-light);
 }
 
+[data-theme="dark"] .file-drop-zone:hover {
+  border-color: #6366F1;
+  background-color: rgba(99, 102, 241, 0.12);
+}
+
 .file-drop-icon {
   color: var(--primary);
+}
+
+[data-theme="dark"] .file-drop-icon {
+  color: #A5B4FC;
 }
 
 .file-drop-zone input {

@@ -1,6 +1,8 @@
 .app-layout {
   display: flex;
-  min-height: 100vh;
+  height: 100vh;
+  max-height: 100vh;
+  overflow: hidden;
   background-color: var(--bg-app);
   color: var(--text-main);
 }
@@ -10,7 +12,11 @@
   display: flex;
   flex-direction: column;
   min-width: 0;
+  height: 100vh;
+  overflow-y: auto;
   overflow-x: hidden;
+  position: relative;
+  -webkit-overflow-scrolling: touch;
 }
 
 .layout-content {
@@ -27,6 +33,7 @@
   border-top: 1px solid var(--border-subtle);
   background-color: var(--bg-card);
   margin-top: auto;
+  flex-shrink: 0;
 }
 
 .app-footer p {

@@ -55,6 +55,11 @@
   color: var(--primary);
 }
 
+[data-theme="dark"] .toggle-btn.active {
+  background-color: rgba(99, 102, 241, 0.2);
+  color: #A5B4FC;
+}
+
 /* Toolbar Card */
 .jobs-toolbar-card {
   background-color: var(--bg-card);
@@ -152,7 +157,7 @@
   border-radius: var(--radius-full);
 }
 .dot-saved { background-color: #64748b; }
-.dot-applied { background-color: #3b82f6; }
+.dot-applied { background-color: #6366F1; }
 .dot-assessment { background-color: #8b5cf6; }
 .dot-interview { background-color: #06b6d4; }
 .dot-offer { background-color: #10b981; }
@@ -245,9 +250,9 @@
 }
 
 .meta-tag.resume-tag {
-  background: rgba(37, 99, 235, 0.1);
-  color: #3b82f6;
-  border-color: rgba(37, 99, 235, 0.2);
+  background: #ECFEFF;
+  color: #0891B2;
+  border-color: rgba(6, 182, 212, 0.25);
 }
 
 .card-footer-row {
@@ -573,6 +578,15 @@
   border-bottom-color: var(--primary);
 }
 
+[data-theme="dark"] .d-tab.active {
+  color: #A5B4FC;
+  border-bottom-color: #6366F1;
+}
+
+[data-theme="dark"] .drawer-eyebrow {
+  color: #A5B4FC;
+}
+
 .drawer-body {
   flex: 1;
   overflow-y: auto;
@@ -639,6 +653,16 @@
   color: var(--primary);
   font-weight: 600;
   font-size: 0.875rem;
+}
+
+[data-theme="dark"] .job-external-button {
+  color: #A5B4FC;
+  border-color: var(--border-strong);
+}
+
+[data-theme="dark"] .job-external-button:hover {
+  background-color: var(--bg-card);
+  color: #FFFFFF;
 }
 
 .recruiter-card-box {

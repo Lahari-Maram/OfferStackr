@@ -12,21 +12,23 @@ import {
   Target,
   Award,
   FileText,
-  BookOpen,
   StickyNote,
   Settings,
-  PlusCircle,
+  Plus,
   LogOut,
   ChevronLeft,
-  ChevronRight,
-  Sparkles
+  ChevronRight
 } from "lucide-react";
+import OfferStackrLogo from "./OfferStackrLogo";
+import UserAvatar from "./UserAvatar";
+import { useUser } from "../context/UserContext";
 import ConfirmModal from "./ConfirmModal";
 import "../styles/sidebar.css";
 
 const primaryNav = [
   { icon: LayoutDashboard, label: "Dashboard", to: "/dashboard" },
   { icon: Briefcase, label: "Applications", to: "/jobs" },
+  { icon: Plus, label: "Add Application", to: "/add-job" },
   { icon: Calendar, label: "Interviews", to: "/interviews" },
   { icon: CheckSquare, label: "Assessments", to: "/assessments" },
 ];
@@ -42,14 +44,13 @@ const insightsNav = [
 const workspaceNav = [
   { icon: FileText, label: "Resume Vault", to: "/resume-vault" },
   { icon: StickyNote, label: "Notes", to: "/notes" },
-  { icon: BookOpen, label: "Career Prep", to: "/career-prep" },
-  { icon: PlusCircle, label: "Add Application", to: "/add-job", highlight: true },
   { icon: Settings, label: "Settings", to: "/settings" },
 ];
 
 export default function Sidebar({ mobileOpen = false, onCloseMobile }) {
   const navigate = useNavigate();
   const location = useLocation();
+  const { user, logout } = useUser();
   const [collapsed, setCollapsed] = useState(() => {
     return localStorage.getItem("offerstackr_sidebar_collapsed") === "true";
   });
@@ -69,17 +70,17 @@ export default function Sidebar({ mobileOpen = false, onCloseMobile }) {
   };
 
   const handleLogout = () => {
-    localStorage.removeItem("token");
+    logout();
     toast.success("Logged out successfully");
     navigate("/login");
   };
 
-  const renderItem = ({ icon: Icon, label, to, highlight }) => (
+  const renderItem = ({ icon: Icon, label, to }) => (
     <NavLink
       key={to}
       to={to}
       className={({ isActive }) =>
-        `nav-item ${isActive ? "active" : ""} ${highlight ? "nav-item-highlight" : ""}`
+        `nav-item ${isActive ? "active" : ""}`
       }
       title={collapsed ? label : undefined}
     >
@@ -89,6 +90,8 @@ export default function Sidebar({ mobileOpen = false, onCloseMobile }) {
       {!collapsed && <span className="nav-label">{label}</span>}
     </NavLink>
   );
+
+  const userName = user?.name || "User";
 
   return (
     <>
@@ -107,12 +110,11 @@ export default function Sidebar({ mobileOpen = false, onCloseMobile }) {
       >
         <div className="sidebar-brand">
           <div className="brand-logo-icon">
-            <Sparkles size={20} className="brand-icon-svg" />
+            <OfferStackrLogo size={22} />
           </div>
           {!collapsed && (
             <div className="brand-text">
               <span className="brand-title">OfferStackr</span>
-              <span className="brand-badge">PRO</span>
             </div>
           )}
           <button
@@ -144,6 +146,20 @@ export default function Sidebar({ mobileOpen = false, onCloseMobile }) {
         </nav>
 
         <div className="sidebar-footer">
+          <NavLink
+            to="/profile"
+            className={({ isActive }) => `sidebar-user-pill ${isActive ? "active" : ""}`}
+            title={collapsed ? `${userName} (Profile)` : undefined}
+          >
+            <UserAvatar src={user?.avatar_url} name={userName} size="sm" showRing={false} />
+            {!collapsed && (
+              <div className="sidebar-user-details">
+                <span className="sidebar-user-name">{userName}</span>
+                <span className="sidebar-user-role">Account & Profile</span>
+              </div>
+            )}
+          </NavLink>
+
           <button
             type="button"
             className="nav-item logout-button"

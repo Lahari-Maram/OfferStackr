@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 import { Mail, KeyRound, Lock, ArrowLeft, RefreshCw } from "lucide-react";
+import OfferStackrLogo from "../components/OfferStackrLogo";
 import api from "../api/axios";
 import PublicNavbar from "../components/PublicNavbar";
 import "../styles/auth.css";
@@ -130,7 +131,7 @@ export default function ForgotPassword() {
 
         <section className="auth-card modern-auth-card" aria-labelledby="forgot-title">
           <div className="auth-brand-badge">
-            <KeyRound size={26} />
+            <OfferStackrLogo size={28} />
           </div>
 
           <div className="auth-heading">

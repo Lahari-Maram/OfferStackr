@@ -1,112 +1,48 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
-import { Sparkles, Sun, Moon, Menu, X } from "lucide-react";
+import { Sun, Moon, Menu, X } from "lucide-react";
+import OfferStackrLogo from "./OfferStackrLogo";
 import { useTheme } from "../context/ThemeContext";
 import "../styles/public-navbar.css";
 
 export default function PublicNavbar() {
   const { theme, toggleTheme } = useTheme();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [scrolled, setScrolled] = useState(false);
+
+  useEffect(() => {
+    const handleScroll = () => {
+      setScrolled(window.scrollY > 20);
+    };
+    handleScroll();
+    window.addEventListener("scroll", handleScroll, { passive: true });
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
 
   return (
-    <header
-      className="public-nav-wrapper"
-      style={{
-        width: "100%",
-        position: "sticky",
-        top: 0,
-        zIndex: 100,
-        boxSizing: "border-box"
-      }}
-    >
-      <div
-        className="public-nav-container"
-        style={{
-          display: "flex",
-          flexDirection: "row",
-          alignItems: "center",
-          justifyContent: "space-between",
-          width: "100%",
-          maxWidth: "1280px",
-          height: "72px",
-          margin: "0 auto",
-          padding: "0 2rem",
-          boxSizing: "border-box",
-          gap: "1.5rem"
-        }}
-      >
+    <header className={`public-nav-wrapper ${scrolled ? "scrolled" : ""}`}>
+      <div className="public-nav-container">
         {/* Brand Logo */}
         <Link
           to="/"
           className="public-logo"
           onClick={() => setMobileMenuOpen(false)}
-          style={{
-            display: "inline-flex",
-            flexDirection: "row",
-            alignItems: "center",
-            gap: "0.85rem",
-            textDecoration: "none",
-            flexShrink: 0,
-            width: "auto",
-            minWidth: "max-content",
-            cursor: "pointer"
-          }}
         >
-          <div
-            className="public-logo-icon"
-            style={{
-              width: "38px",
-              height: "38px",
-              minWidth: "38px",
-              minHeight: "38px",
-              borderRadius: "10px",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              flexShrink: 0
-            }}
-          >
-            <Sparkles size={18} />
+          <div className="public-logo-icon">
+            <OfferStackrLogo size={24} />
           </div>
-          <span
-            className="public-logo-text"
-            style={{
-              fontSize: "1.3rem",
-              fontWeight: 800,
-              whiteSpace: "nowrap",
-              lineHeight: 1
-            }}
-          >
-            OfferStackr
-          </span>
+          <span className="public-logo-text">OfferStackr</span>
         </Link>
 
         {/* Center Nav Links */}
-        <nav
-          className="public-nav-links"
-          style={{
-            display: "flex",
-            flexDirection: "row",
-            alignItems: "center",
-            gap: "0.5rem"
-          }}
-        >
-          <a href="/#features" className="public-nav-link">Features</a>
-          <a href="/#workflow" className="public-nav-link">Workflow</a>
-          <a href="/#about" className="public-nav-link">About</a>
+        <nav className="public-nav-links" aria-label="Main Navigation">
+          <a href="#features" className="public-nav-link">Features</a>
+          <a href="#workflow" className="public-nav-link">Pipeline Workflow</a>
+          <a href="#about" className="public-nav-link">Why OfferStackr</a>
         </nav>
 
         {/* Right Actions */}
-        <div
-          className="public-nav-actions"
-          style={{
-            display: "flex",
-            flexDirection: "row",
-            alignItems: "center",
-            gap: "0.85rem",
-            flexShrink: 0
-          }}
-        >
+        <div className="public-nav-actions">
           <button
             type="button"
             className="theme-toggle-btn public-theme-btn"
@@ -117,12 +53,13 @@ export default function PublicNavbar() {
             {theme === "dark" ? <Sun size={17} /> : <Moon size={17} />}
           </button>
           <Link to="/login" className="public-btn-ghost">Sign In</Link>
-          <Link to="/signup" className="public-btn-primary">Get Started</Link>
+          <Link to="/signup" className="public-btn-primary">Create Account</Link>
           <button
             type="button"
             className="public-mobile-toggle"
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
             aria-label="Toggle navigation menu"
+            aria-expanded={mobileMenuOpen}
           >
             {mobileMenuOpen ? <X size={20} /> : <Menu size={20} />}
           </button>
@@ -132,27 +69,27 @@ export default function PublicNavbar() {
       {/* Mobile Dropdown Menu */}
       {mobileMenuOpen && (
         <div className="public-mobile-menu">
-          <nav className="public-mobile-links">
+          <nav className="public-mobile-links" aria-label="Mobile Navigation">
             <a
-              href="/#features"
+              href="#features"
               className="public-mobile-link"
               onClick={() => setMobileMenuOpen(false)}
             >
               Features
             </a>
             <a
-              href="/#workflow"
+              href="#workflow"
               className="public-mobile-link"
               onClick={() => setMobileMenuOpen(false)}
             >
-              Workflow
+              Pipeline Workflow
             </a>
             <a
-              href="/#about"
+              href="#about"
               className="public-mobile-link"
               onClick={() => setMobileMenuOpen(false)}
             >
-              About
+              Why OfferStackr
             </a>
           </nav>
           <div className="public-mobile-actions">
@@ -168,7 +105,7 @@ export default function PublicNavbar() {
               className="public-btn-primary mobile-btn"
               onClick={() => setMobileMenuOpen(false)}
             >
-              Get Started Free
+              Create Account
             </Link>
           </div>
         </div>

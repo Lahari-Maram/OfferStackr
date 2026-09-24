@@ -10,8 +10,13 @@ import {
   ShieldCheck,
   Zap,
   Sparkles,
-  Award
+  Award,
+  CheckCircle2,
+  Lock,
+  Flame,
+  Code
 } from "lucide-react";
+import OfferStackrLogo from "../components/OfferStackrLogo";
 import PublicNavbar from "../components/PublicNavbar";
 import "../styles/public-home.css";
 
@@ -65,23 +70,23 @@ export default function PublicHome() {
         {/* HERO SECTION */}
         <section className="landing-hero">
           <div className="hero-container">
-            <div className="hero-badge">
+            <div className="hero-badge animate-fade-in">
               <Sparkles size={16} />
               <span>THE ALL-IN-ONE JOB SEARCH SAAS</span>
             </div>
 
-            <h1 className="hero-headline">
+            <h1 className="hero-headline animate-fade-in delay-1">
               Transform Your Job Search into a{" "}
               <span className="gradient-text">Streamlined Pipeline.</span>
             </h1>
 
-            <p className="hero-subtext">
+            <p className="hero-subtext animate-fade-in delay-2">
               OfferStackr gives job seekers complete control over applications,
               multi-round interviews, assessments, resumes, and progress analytics
               in one beautifully focused workspace.
             </p>
 
-            <div className="hero-cta-group">
+            <div className="hero-cta-group animate-fade-in delay-3">
               <Link to="/signup" className="btn-hero-primary">
                 Get Started Free <ArrowRight size={18} />
               </Link>
@@ -90,8 +95,31 @@ export default function PublicHome() {
               </Link>
             </div>
 
+            {/* TRUST & METRIC HIGHLIGHTS */}
+            <div className="hero-metrics-strip animate-fade-in delay-4">
+              <div className="metric-item">
+                <CheckCircle2 size={16} className="metric-icon" />
+                <span>Zero Spreadsheet Chaos</span>
+              </div>
+              <div className="metric-divider" />
+              <div className="metric-item">
+                <Lock size={16} className="metric-icon" />
+                <span>100% Private & Secure</span>
+              </div>
+              <div className="metric-divider" />
+              <div className="metric-item">
+                <Flame size={16} className="metric-icon" />
+                <span>Streak Tracking & Goals</span>
+              </div>
+              <div className="metric-divider" />
+              <div className="metric-item">
+                <Zap size={16} className="metric-icon" />
+                <span>Instant CSV Import & Export</span>
+              </div>
+            </div>
+
             {/* HERO PREVIEW CARD */}
-            <div className="hero-preview-frame">
+            <div className="hero-preview-frame animate-float">
               <div className="preview-window">
                 <div className="window-header">
                   <div className="window-dots">
@@ -263,26 +291,114 @@ export default function PublicHome() {
         </section>
       </main>
 
+      {/* FOOTER */}
       <footer className="public-footer">
         <div className="public-footer-container">
           <div className="footer-brand">
             <div className="public-logo">
               <div className="public-logo-icon small">
-                <Sparkles size={16} />
+                <OfferStackrLogo size={20} />
               </div>
               <span className="public-logo-text">OfferStackr</span>
             </div>
             <p>Empowering candidates to land dream roles with organization and clarity.</p>
+            <div className="footer-developer-badge">
+              <Code size={14} className="badge-dev-icon" />
+              <span>Developed by <strong>@Laharimaram</strong></span>
+            </div>
           </div>
-          <div className="footer-links-group">
-            <Link to="/login">Sign In</Link>
-            <Link to="/signup">Get Started</Link>
-            <a href="/#features">Features</a>
-            <a href="/#workflow">Workflow</a>
+          <div className="footer-nav-columns">
+            <div className="footer-nav-col">
+              <h4>Product</h4>
+              <ul className="footer-nav-list">
+                <li>
+                  <a href="#features" className="footer-nav-link">
+                    <span className="footer-bullet">•</span>
+                    <span>Features</span>
+                  </a>
+                </li>
+                <li>
+                  <a href="#workflow" className="footer-nav-link">
+                    <span className="footer-bullet">•</span>
+                    <span>Pipeline Workflow</span>
+                  </a>
+                </li>
+                <li>
+                  <a href="#about" className="footer-nav-link">
+                    <span className="footer-bullet">•</span>
+                    <span>Why OfferStackr</span>
+                  </a>
+                </li>
+              </ul>
+            </div>
+            <div className="footer-nav-col">
+              <h4>Account</h4>
+              <ul className="footer-nav-list">
+                <li>
+                  <Link to="/login" className="footer-nav-link">
+                    <span className="footer-bullet">•</span>
+                    <span>Sign In</span>
+                  </Link>
+                </li>
+                <li>
+                  <Link to="/signup" className="footer-nav-link">
+                    <span className="footer-bullet">•</span>
+                    <span>Create Account</span>
+                  </Link>
+                </li>
+                <li>
+                  <Link to="/forgot-password" className="footer-nav-link">
+                    <span className="footer-bullet">•</span>
+                    <span>Reset Password</span>
+                  </Link>
+                </li>
+              </ul>
+            </div>
+            <div className="footer-nav-col">
+              <h4>Connect</h4>
+              <ul className="footer-nav-list">
+                <li>
+                  <a
+                    href="https://www.linkedin.com/in/lahari-maram-17bba4265/"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="footer-nav-link"
+                  >
+                    <span className="footer-bullet">•</span>
+                    <span>LinkedIn</span>
+                  </a>
+                </li>
+                <li>
+                  <a
+                    href="https://github.com/Lahari-Maram"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="footer-nav-link"
+                  >
+                    <span className="footer-bullet">•</span>
+                    <span>GitHub</span>
+                  </a>
+                </li>
+                <li>
+                  <a
+                    href="https://github.com/Lahari-Maram/OfferStackr"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="footer-nav-link"
+                  >
+                    <span className="footer-bullet">•</span>
+                    <span>Source Code</span>
+                  </a>
+                </li>
+              </ul>
+            </div>
           </div>
         </div>
         <div className="footer-copyright-bar">
-          <p>© 2026 OfferStackr. All rights reserved. Designed & built by Lahari.</p>
+          <div className="footer-copyright-content">
+            <p>© 2026 OfferStackr. All rights reserved.</p>
+            <p className="footer-built-by">Crafted with precision by <strong>@Laharimaram</strong>.</p>
+          </div>
         </div>
       </footer>
     </div>

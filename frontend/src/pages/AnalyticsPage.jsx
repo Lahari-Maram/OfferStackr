@@ -26,7 +26,7 @@ import Layout from "../components/Layout";
 import { useTheme } from "../context/ThemeContext";
 import "../styles/analytics.css";
 
-const STATUS_COLORS = ["#64748b", "#3b82f6", "#8b5cf6", "#06b6d4", "#10b981", "#ef4444", "#94a3b8"];
+const STATUS_COLORS = ["#64748b", "#6366F1", "#8b5cf6", "#06b6d4", "#10b981", "#ef4444", "#94a3b8"];
 
 export default function AnalyticsPage() {
   const { theme } = useTheme();
@@ -152,8 +152,8 @@ export default function AnalyticsPage() {
                 <AreaChart data={monthlyTrend} margin={{ top: 10, right: 20, left: -20, bottom: 0 }}>
                   <defs>
                     <linearGradient id="colorApps" x1="0" y1="0" x2="0" y2="1">
-                      <stop offset="5%" stopColor="#3b82f6" stopOpacity={0.4} />
-                      <stop offset="95%" stopColor="#3b82f6" stopOpacity={0.0} />
+                      <stop offset="5%" stopColor="#6366F1" stopOpacity={0.4} />
+                      <stop offset="95%" stopColor="#6366F1" stopOpacity={0.0} />
                     </linearGradient>
                   </defs>
                   <CartesianGrid strokeDasharray="3 3" stroke={theme === "dark" ? "#1e293b" : "#f1f5f9"} />
@@ -163,7 +163,7 @@ export default function AnalyticsPage() {
                   <Area
                     type="monotone"
                     dataKey="applications"
-                    stroke="#3b82f6"
+                    stroke="#6366F1"
                     strokeWidth={2}
                     fillOpacity={1}
                     fill="url(#colorApps)"

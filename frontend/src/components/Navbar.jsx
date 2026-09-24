@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import { useNavigate, Link } from "react-router-dom";
+import { useNavigate, useLocation, Link } from "react-router-dom";
 import { toast } from "react-toastify";
 import {
   Menu,
@@ -10,17 +10,52 @@ import {
   LogOut,
   CheckCircle,
   PlusCircle,
-  Briefcase
+  Briefcase,
+  LayoutDashboard,
+  BarChart3,
+  Target,
+  Trophy,
+  Calendar,
+  CheckSquare,
+  FileText,
+  StickyNote,
+  Clock,
+  User,
+  FileSpreadsheet
 } from "lucide-react";
 import api from "../api/axios";
+import OfferStackrLogo from "./OfferStackrLogo";
+import UserAvatar from "./UserAvatar";
 import { useTheme } from "../context/ThemeContext";
+import { useUser } from "../context/UserContext";
 import ConfirmModal from "./ConfirmModal";
 import "../styles/navbar.css";
+
+const getPageMeta = (pathname) => {
+  if (!pathname) return { title: "Dashboard", icon: LayoutDashboard };
+  const p = pathname.toLowerCase();
+  if (p.startsWith("/dashboard")) return { title: "Dashboard", icon: LayoutDashboard };
+  if (p.startsWith("/jobs") || p.startsWith("/applications")) return { title: "Applications", icon: Briefcase };
+  if (p.startsWith("/add-job") || p.startsWith("/add-application")) return { title: "Add Application", icon: PlusCircle };
+  if (p.startsWith("/analytics")) return { title: "Analytics", icon: BarChart3 };
+  if (p.startsWith("/goals") || p.startsWith("/streaks") || p.startsWith("/activity")) return { title: "Streaks & Activity", icon: Target };
+  if (p.startsWith("/achievements")) return { title: "Achievements", icon: Trophy };
+  if (p.startsWith("/interviews")) return { title: "Interviews", icon: Calendar };
+  if (p.startsWith("/assessments")) return { title: "Assessments", icon: CheckSquare };
+  if (p.startsWith("/resume-vault") || p.startsWith("/resumes")) return { title: "Resume Vault", icon: FileText };
+  if (p.startsWith("/career-hub") || p.startsWith("/career-prep") || p.startsWith("/notes")) return { title: "Career Hub", icon: StickyNote };
+  if (p.startsWith("/timeline")) return { title: "Timeline", icon: Clock };
+  if (p.startsWith("/profile")) return { title: "Profile", icon: User };
+  if (p.startsWith("/settings")) return { title: "Settings", icon: Settings };
+  if (p.startsWith("/reminders")) return { title: "Reminders", icon: Bell };
+  if (p.startsWith("/reports")) return { title: "Reports", icon: FileSpreadsheet };
+  return { title: "Dashboard", icon: LayoutDashboard };
+};
 
 export default function Navbar({ onToggleMobileSidebar }) {
   const navigate = useNavigate();
   const { theme, toggleTheme } = useTheme();
-  const [profile, setProfile] = useState(null);
+  const { user, logout } = useUser();
   const [menuOpen, setMenuOpen] = useState(false);
   const [notifOpen, setNotifOpen] = useState(false);
   const [notifications, setNotifications] = useState([]);
@@ -28,21 +63,17 @@ export default function Navbar({ onToggleMobileSidebar }) {
   const menuRef = useRef(null);
   const notifRef = useRef(null);
 
-  const fetchProfileAndNotifications = async () => {
+  const fetchNotifications = async () => {
     try {
-      const [pRes, nRes] = await Promise.all([
-        api.get("/profile"),
-        api.get("/notifications").catch(() => ({ data: [] })),
-      ]);
-      setProfile(pRes.data);
-      setNotifications(nRes.data || []);
+      const nRes = await api.get("/notifications").catch(() => ({ data: [] }));
+      setNotifications(nRes?.data || []);
     } catch {
       // Ignored if auth expired or loading
     }
   };
 
   useEffect(() => {
-    fetchProfileAndNotifications();
+    fetchNotifications();
   }, []);
 
   useEffect(() => {
@@ -69,7 +100,7 @@ export default function Navbar({ onToggleMobileSidebar }) {
   }, []);
 
   const handleLogout = () => {
-    localStorage.removeItem("token");
+    logout();
     toast.success("Logged out successfully");
     navigate("/login");
   };
@@ -85,10 +116,12 @@ export default function Navbar({ onToggleMobileSidebar }) {
     }
   };
 
-  const name = profile?.name || "User";
-  const email = profile?.email || "";
-  const initial = name.charAt(0).toUpperCase();
+  const name = user?.name || "User";
+  const email = user?.email || "";
   const unreadCount = notifications.filter((n) => n.read === 0).length;
+
+  const location = useLocation();
+  const { title: pageTitle, icon: PageIcon } = getPageMeta(location.pathname);
 
   return (
     <>
@@ -102,8 +135,18 @@ export default function Navbar({ onToggleMobileSidebar }) {
           >
             <Menu size={22} />
           </button>
-          <div className="navbar-brand-mobile">
-            <h2>OfferStackr</h2>
+          
+          <Link to="/dashboard" className="navbar-brand-header" title="OfferStackr Home">
+            <OfferStackrLogo size={22} />
+            <span className="navbar-app-name">OfferStackr</span>
+          </Link>
+
+          <div className="navbar-page-identity" aria-current="page">
+            <span className="navbar-page-divider" aria-hidden="true">/</span>
+            <div className="navbar-page-title-badge">
+              {PageIcon && <PageIcon size={16} className="navbar-page-icon" />}
+              <span className="navbar-active-title">{pageTitle}</span>
+            </div>
           </div>
         </div>
 
@@ -196,7 +239,7 @@ export default function Navbar({ onToggleMobileSidebar }) {
               aria-expanded={menuOpen}
               aria-haspopup="menu"
             >
-              <div className="profile-avatar-circle">{initial}</div>
+              <UserAvatar src={user?.avatar_url} name={name} size="sm" showRing={false} />
               <div className="profile-details-text">
                 <span className="profile-name">{name}</span>
               </div>
@@ -206,7 +249,7 @@ export default function Navbar({ onToggleMobileSidebar }) {
             {menuOpen && (
               <div className="dropdown-panel profile-panel">
                 <div className="profile-card-head">
-                  <div className="profile-avatar-circle large">{initial}</div>
+                  <UserAvatar src={user?.avatar_url} name={name} size="lg" />
                   <div className="profile-info-block">
                     <strong className="user-name">{name}</strong>
                     <span className="user-email">{email}</span>

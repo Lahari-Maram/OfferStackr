@@ -37,7 +37,7 @@
   padding: 4px;
   border-radius: var(--radius-sm);
 }
-.funnel-icon.blue { color: #3b82f6; background: rgba(59, 130, 246, 0.1); }
+.funnel-icon.blue { color: #6366F1; background: rgba(99, 102, 241, 0.1); }
 .funnel-icon.purple { color: #8b5cf6; background: rgba(139, 92, 246, 0.1); }
 .funnel-icon.green { color: #10b981; background: rgba(16, 185, 129, 0.1); }
 .funnel-icon.orange { color: #f59e0b; background: rgba(245, 158, 11, 0.1); }

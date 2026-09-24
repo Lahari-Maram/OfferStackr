@@ -44,11 +44,117 @@
   margin: 0;
 }
 
-.icon-blue { color: #3b82f6; }
+.icon-blue { color: #6366F1; }
 .icon-purple { color: #8b5cf6; }
 .icon-green { color: #10b981; }
 .icon-orange { color: #f59e0b; }
 .icon-danger { color: #ef4444; }
+.icon-cyan { color: #06b6d4; }
+
+/* Profile Photo Section */
+.profile-avatar-row {
+  display: flex;
+  align-items: center;
+  gap: 1.75rem;
+  background-color: var(--bg-card-subtle);
+  border-radius: var(--radius-lg);
+  padding: 1.5rem;
+  border: 1px solid var(--border-subtle);
+}
+
+.avatar-preview-box {
+  position: relative;
+  display: inline-flex;
+  flex-shrink: 0;
+}
+
+.avatar-preview-wrapper {
+  position: relative;
+  display: inline-flex;
+  cursor: pointer;
+}
+
+.avatar-plus-btn {
+  position: absolute;
+  bottom: 0px;
+  right: 0px;
+  width: 28px;
+  height: 28px;
+  border-radius: var(--radius-full);
+  background-color: #2563eb;
+  color: #ffffff;
+  border: 2px solid var(--bg-card);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.25);
+  cursor: pointer;
+  transition: all 0.15s ease;
+  padding: 0;
+  z-index: 5;
+}
+
+.avatar-plus-btn:hover {
+  background-color: #1d4ed8;
+  transform: scale(1.1);
+}
+
+.avatar-busy-spinner {
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.5);
+  border-radius: var(--radius-full);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #ffffff;
+  backdrop-filter: blur(2px);
+  z-index: 6;
+}
+
+.spin-icon {
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+.avatar-actions-meta {
+  display: flex;
+  flex-direction: column;
+  gap: 0.85rem;
+  flex: 1;
+  min-width: 0;
+}
+
+.avatar-status-badge strong {
+  display: block;
+  font-size: 1rem;
+  color: var(--text-main);
+  margin-bottom: 0.25rem;
+}
+
+.avatar-status-badge span {
+  font-size: 0.82rem;
+  color: var(--text-muted);
+}
+
+.avatar-button-group {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+}
+
+@media (max-width: 600px) {
+  .profile-avatar-row {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 1.25rem;
+  }
+}
 
 .settings-form {
   display: flex;

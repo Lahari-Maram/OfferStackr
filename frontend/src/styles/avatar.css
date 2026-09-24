@@ -1,0 +1,89 @@
+/* ================= OFFERSTACKR USER AVATAR ================= */
+
+.offerstackr-avatar {
+  position: relative;
+  border-radius: var(--radius-full, 9999px);
+  background: linear-gradient(135deg, #2563eb, #8b5cf6);
+  color: #ffffff;
+  font-weight: 700;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  overflow: hidden;
+  user-select: none;
+  box-sizing: border-box;
+}
+
+/* Sizing Tokens */
+.offerstackr-avatar.avatar-xs {
+  width: 24px;
+  height: 24px;
+  min-width: 24px;
+  font-size: 0.75rem;
+}
+
+.offerstackr-avatar.avatar-sm {
+  width: 32px;
+  height: 32px;
+  min-width: 32px;
+  font-size: 0.85rem;
+}
+
+.offerstackr-avatar.avatar-md {
+  width: 40px;
+  height: 40px;
+  min-width: 40px;
+  font-size: 1rem;
+}
+
+.offerstackr-avatar.avatar-lg {
+  width: 44px;
+  height: 44px;
+  min-width: 44px;
+  font-size: 1.1rem;
+}
+
+.offerstackr-avatar.avatar-xl {
+  width: 64px;
+  height: 64px;
+  min-width: 64px;
+  font-size: 1.6rem;
+}
+
+.offerstackr-avatar.avatar-2xl {
+  width: 88px;
+  height: 88px;
+  min-width: 88px;
+  font-size: 2.2rem;
+}
+
+/* Fallback Initials */
+.avatar-initial-fallback {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #ffffff;
+  font-weight: 700;
+  line-height: 1;
+}
+
+/* Uploaded Image */
+.avatar-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: var(--radius-full, 9999px);
+  transition: opacity 0.15s ease-in-out;
+}
+
+.avatar-image.loading {
+  opacity: 0;
+  position: absolute;
+}
+
+.avatar-image.loaded {
+  opacity: 1;
+}

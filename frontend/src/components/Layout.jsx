@@ -18,7 +18,7 @@ export default function Layout({ children }) {
         <Navbar onToggleMobileSidebar={() => setMobileOpen((v) => !v)} />
         <main className="layout-content">{children}</main>
         <footer className="app-footer">
-          <p>© 2026 OfferStackr. All rights reserved. Designed & built by Lahari.</p>
+          <p>© 2026 OfferStackr. All rights reserved. Designed & built by <strong>@Laharimaram</strong>.</p>
         </footer>
       </div>
     </div>

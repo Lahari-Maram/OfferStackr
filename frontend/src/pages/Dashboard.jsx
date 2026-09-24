@@ -12,7 +12,8 @@ import {
   FileText,
   ChevronRight,
   CheckCircle2,
-  Sparkles
+  Sparkles,
+  StickyNote
 } from "lucide-react";
 import {
   PieChart,
@@ -29,12 +30,14 @@ import {
 } from "recharts";
 import api from "../api/axios";
 import Layout from "../components/Layout";
+import UserAvatar from "../components/UserAvatar";
 import { useTheme } from "../context/ThemeContext";
+import { useUser } from "../context/UserContext";
 import "../styles/dashboard.css";
 
 const STATUS_COLORS = {
   Saved: "#64748b",
-  Applied: "#3b82f6",
+  Applied: "#6366F1",
   Assessment: "#8b5cf6",
   Interview: "#06b6d4",
   Offer: "#10b981",
@@ -45,8 +48,16 @@ const STATUS_COLORS = {
 export default function Dashboard() {
   const navigate = useNavigate();
   const { theme } = useTheme();
+  const { user } = useUser();
   
-  const [profile, setProfile] = useState(null);
+  const [profile, setProfile] = useState(() => {
+    try {
+      const cached = localStorage.getItem("offerstackr_user_name");
+      return cached ? { name: cached } : null;
+    } catch {
+      return null;
+    }
+  });
   const [stats, setStats] = useState(null);
   const [analytics, setAnalytics] = useState(null);
   const [recentJobs, setRecentJobs] = useState([]);
@@ -62,37 +73,72 @@ export default function Dashboard() {
   const loadDashboardData = async () => {
     try {
       setLoading(true);
-      const [pRes, dRes, aRes, jRes, iRes, fRes, assRes] = await Promise.all([
+
+      const [pRes, dRes, aRes, jRes, iRes, fRes, assRes] = await Promise.allSettled([
         api.get("/profile"),
         api.get("/dashboard"),
         api.get("/dashboard/analytics"),
         api.get("/jobs?limit=50"),
         api.get("/jobs/upcoming-interviews"),
         api.get("/jobs/upcoming-followups"),
-        api.get("/assessments").catch(() => ({ data: [] }))
+        api.get("/assessments")
       ]);
 
-      setProfile(pRes.data);
-      setStats(dRes.data);
-      setAnalytics(aRes.data);
-      setGoalInput(dRes.data.weekly_goal || 10);
-      
-      // Sort recent jobs by applied_date desc or id desc
-      const sortedJobs = [...(jRes.data || [])].sort((a, b) => {
-        if (b.applied_date && a.applied_date) {
-          return new Date(b.applied_date) - new Date(a.applied_date);
+      if (pRes.status === "fulfilled" && pRes.value?.data) {
+        setProfile(pRes.value.data);
+        const nameVal = pRes.value.data.name || pRes.value.data.displayName || pRes.value.data.full_name;
+        if (nameVal && typeof nameVal === "string") {
+          localStorage.setItem("offerstackr_user_name", nameVal.trim());
         }
-        return b.id - a.id;
-      });
-      setRecentJobs(sortedJobs.slice(0, 5));
-      setInterviews((iRes.data || []).slice(0, 5));
-      setFollowups((fRes.data || []).slice(0, 5));
-      
-      const upcomingAss = (assRes.data || []).filter(a => a.completed === 0).slice(0, 5);
-      setAssessments(upcomingAss);
+      } else {
+        // Fallback standalone /profile fetch
+        try {
+          const standaloneProfile = await api.get("/profile");
+          if (standaloneProfile?.data) {
+            setProfile(standaloneProfile.data);
+            const nameVal = standaloneProfile.data.name || standaloneProfile.data.displayName || standaloneProfile.data.full_name;
+            if (nameVal && typeof nameVal === "string") {
+              localStorage.setItem("offerstackr_user_name", nameVal.trim());
+            }
+          }
+        } catch {
+          // Keep cached profile if available
+        }
+      }
+
+      if (dRes.status === "fulfilled" && dRes.value?.data) {
+        setStats(dRes.value.data);
+        setGoalInput(dRes.value.data.weekly_goal || 10);
+      }
+
+      if (aRes.status === "fulfilled" && aRes.value?.data) {
+        setAnalytics(aRes.value.data);
+      }
+
+      if (jRes.status === "fulfilled" && jRes.value?.data) {
+        const sortedJobs = [...(jRes.value.data || [])].sort((a, b) => {
+          if (b.applied_date && a.applied_date) {
+            return new Date(b.applied_date) - new Date(a.applied_date);
+          }
+          return b.id - a.id;
+        });
+        setRecentJobs(sortedJobs.slice(0, 5));
+      }
+
+      if (iRes.status === "fulfilled" && iRes.value?.data) {
+        setInterviews((iRes.value.data || []).slice(0, 5));
+      }
+
+      if (fRes.status === "fulfilled" && fRes.value?.data) {
+        setFollowups((fRes.value.data || []).slice(0, 5));
+      }
+
+      if (assRes.status === "fulfilled" && assRes.value?.data) {
+        const upcomingAss = (assRes.value.data || []).filter(a => a.completed === 0).slice(0, 5);
+        setAssessments(upcomingAss);
+      }
     } catch (error) {
       console.error("Dashboard error:", error);
-      toast.error("Could not load dashboard information");
     } finally {
       setLoading(false);
     }
@@ -143,7 +189,7 @@ export default function Dashboard() {
 
   const activityData = analytics?.weekly_activity || [];
 
-  if (loading && !stats) {
+  if (loading && !stats && !profile) {
     return (
       <Layout>
         <div className="dashboard-loading-state">
@@ -154,20 +200,41 @@ export default function Dashboard() {
     );
   }
 
-  const name = profile?.name || "there";
+  const getDisplayName = () => {
+    if (!profile) {
+      const cached = localStorage.getItem("offerstackr_user_name");
+      return cached && cached.trim() ? cached.trim() : null;
+    }
+    const rawName = profile.name || profile.displayName || profile.full_name || profile.username;
+    if (rawName && typeof rawName === "string" && rawName.trim()) {
+      return rawName.trim();
+    }
+    const cached = localStorage.getItem("offerstackr_user_name");
+    return cached && cached.trim() ? cached.trim() : null;
+  };
+
+  const displayName = getDisplayName();
+  const greetingText = displayName ? `Welcome back, ${displayName}! 👋` : "Welcome back! 👋";
 
   return (
     <Layout>
       <div className="dashboard-page">
         {/* HERO BANNER */}
         <div className="dashboard-header-hero">
-          <div className="hero-greeting">
-            <div className="greeting-badge">
-              <Sparkles size={16} />
-              <span>CAREER OVERVIEW</span>
+          <div className="hero-greeting-with-avatar">
+            <UserAvatar
+              src={user?.avatar_url}
+              name={displayName || user?.name}
+              size="lg"
+            />
+            <div className="hero-greeting">
+              <div className="greeting-badge">
+                <Sparkles size={16} />
+                <span>CAREER OVERVIEW</span>
+              </div>
+              <h1>{greetingText}</h1>
+              <p>Here is the real-time status of your job-search pipeline and upcoming milestones.</p>
             </div>
-            <h1>Welcome back, {name}! 👋</h1>
-            <p>Here is the real-time status of your job-search pipeline and upcoming milestones.</p>
           </div>
 
           <div className="hero-actions-bar">
@@ -341,12 +408,12 @@ export default function Dashboard() {
               <button
                 type="button"
                 className="quick-action-item"
-                onClick={() => navigate("/career-prep")}
+                onClick={() => navigate("/notes")}
               >
-                <Sparkles size={18} className="qa-icon" />
+                <StickyNote size={18} className="qa-icon" />
                 <div>
-                  <strong>Career Prep</strong>
-                  <small>Interview Q&A</small>
+                  <strong>Notes Hub</strong>
+                  <small>Personal research</small>
                 </div>
               </button>
             </div>
@@ -356,12 +423,23 @@ export default function Dashboard() {
           <div className="dash-card status-chart-card">
             <div className="dash-card-header">
               <div>
-                <h3>Pipeline Distribution</h3>
+                <h3>Pipeline</h3>
                 <p>Breakdown by current application status.</p>
               </div>
-              <span className="rate-badge">
-                Interview Rate: {analytics?.interview_rate || 0}%
-              </span>
+              <div style={{ display: "flex", alignItems: "center", gap: "0.65rem" }}>
+                <span className="rate-badge">
+                  Interview Rate: {analytics?.interview_rate || 0}%
+                </span>
+                <button
+                  type="button"
+                  className="btn btn-primary btn-sm"
+                  onClick={() => navigate("/add-job")}
+                  title="Add Application"
+                >
+                  <Plus size={15} />
+                  <span>Add Application</span>
+                </button>
+              </div>
             </div>
 
             {pieData.length === 0 ? (
@@ -369,6 +447,15 @@ export default function Dashboard() {
                 <Briefcase size={36} className="empty-icon-muted" />
                 <p>No application data yet</p>
                 <small>Add applications to visualize your pipeline stages.</small>
+                <button
+                  type="button"
+                  className="btn btn-primary btn-sm"
+                  style={{ marginTop: "0.75rem" }}
+                  onClick={() => navigate("/add-job")}
+                >
+                  <Plus size={15} />
+                  <span>Add Application</span>
+                </button>
               </div>
             ) : (
               <div className="chart-container-wrap">
@@ -428,6 +515,7 @@ export default function Dashboard() {
                 <XAxis dataKey="day" stroke={theme === "dark" ? "#64748b" : "#94a3b8"} fontSize={12} />
                 <YAxis allowDecimals={false} stroke={theme === "dark" ? "#64748b" : "#94a3b8"} fontSize={12} />
                 <Tooltip
+                  cursor={{ fill: "rgba(99, 102, 241, 0.12)", radius: 6 }}
                   contentStyle={{
                     backgroundColor: theme === "dark" ? "#0f172a" : "#ffffff",
                     borderColor: theme === "dark" ? "#334155" : "#e2e8f0",
@@ -435,7 +523,12 @@ export default function Dashboard() {
                     borderRadius: "8px",
                   }}
                 />
-                <Bar dataKey="applications" fill="#3b82f6" radius={[6, 6, 0, 0]} name="Applications" />
+                <Bar
+                  dataKey="applications"
+                  fill={theme === "dark" ? "rgba(139, 92, 246, 0.85)" : "rgba(46, 16, 101, 0.85)"}
+                  radius={[6, 6, 0, 0]}
+                  name="Applications"
+                />
               </BarChart>
             </ResponsiveContainer>
           </div>

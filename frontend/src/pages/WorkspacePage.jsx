@@ -226,6 +226,7 @@ function WorkspacePage({ type }) {
 
   const logoutFromSettings = () => {
     localStorage.removeItem("token");
+    localStorage.removeItem("offerstackr_user_name");
     toast.success("Logged out successfully");
     navigate("/login");
   };

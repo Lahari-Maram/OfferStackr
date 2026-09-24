@@ -20,6 +20,7 @@ class UserResponse(BaseModel):
     email: EmailStr
     weekly_goal: int = 10
     has_resume: bool = False
+    avatar_url: str | None = None
     created_at: datetime | None = None
 
 class UpdateProfile(BaseModel):
@@ -327,6 +328,32 @@ class StreakResponse(BaseModel):
     longest_streak: int
     total_active_days: int
     activity_dates: list[str]
+
+class ActivityDayItem(BaseModel):
+    type: str
+    title: str
+    subtitle: str | None = None
+    status: str | None = None
+
+class ActivityDaySummary(BaseModel):
+    date: str
+    applications: int = 0
+    interviews: int = 0
+    assessments: int = 0
+    total: int = 0
+    items: list[ActivityDayItem] = []
+
+class ActivityCalendarResponse(BaseModel):
+    year: int
+    available_years: list[int]
+    total_activities_year: int
+    total_active_days_year: int
+    total_applications_year: int
+    current_streak: int
+    longest_streak: int
+    total_active_days_all_time: int
+    daily_activity: dict[str, ActivityDaySummary]
+    monthly_counts: dict[str, int]
 
 class AchievementResponse(BaseModel):
     badge_key: str

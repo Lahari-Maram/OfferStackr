@@ -3,9 +3,11 @@ import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
 import { ThemeProvider } from "./context/ThemeContext";
+import { UserProvider } from "./context/UserContext";
 import ProtectedRoute from "./components/ProtectedRoute";
 import "./styles/public-navbar.css";
 import "./styles/public-home.css";
+import "./styles/avatar.css";
 
 import PublicHome from "./pages/PublicHome";
 import Login from "./pages/Login";
@@ -31,7 +33,8 @@ import SettingsPage from "./pages/SettingsPage";
 function App() {
   return (
     <ThemeProvider>
-      <BrowserRouter>
+      <UserProvider>
+        <BrowserRouter>
         <Routes>
           {/* Public Routes */}
           <Route path="/" element={<PublicHome />} />
@@ -194,6 +197,7 @@ function App() {
           theme="colored"
         />
       </BrowserRouter>
+      </UserProvider>
     </ThemeProvider>
   );
 }

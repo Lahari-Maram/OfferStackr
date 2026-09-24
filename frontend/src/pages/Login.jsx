@@ -1,7 +1,8 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
-import { Mail, Lock, Eye, EyeOff, Sparkles, ArrowRight } from "lucide-react";
+import { Mail, Lock, Eye, EyeOff, ArrowRight } from "lucide-react";
+import OfferStackrLogo from "../components/OfferStackrLogo";
 import api from "../api/axios";
 import PublicNavbar from "../components/PublicNavbar";
 import "../styles/auth.css";
@@ -49,7 +50,7 @@ export default function Login() {
         
         <section className="auth-card modern-auth-card" aria-labelledby="signin-title">
           <div className="auth-brand-badge">
-            <Sparkles size={24} />
+            <OfferStackrLogo size={28} />
           </div>
           
           <div className="auth-heading">
